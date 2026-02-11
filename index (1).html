@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Valentín Interactivo</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  background: url("IMG-20260205-WA0006.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255,192,203,0.55);
+}
+
+#recuadro2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,182,193,0.45);
+  padding: 25px;
+  text-align: center;
+  border-radius: 22px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  max-width: 90%;
+}
+
+#cajaPregunta {
+  background: rgba(255,255,255,0.25);
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 18px;
+}
+
+#recuadro3 {
+  background: rgba(255,192,203,0.25);
+  padding: 18px;
+  border-radius: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  overflow: visible;
+}
+
+#recuadro3 button {
+  padding: 12px 26px;
+  font-size: 1.05em;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.45s ease;
+}
+
+#btnYes {
+  background: black;
+  color: white;
+  z-index: 3;
+}
+
+#btnNo {
+  background: white;
+  color: black;
+}
+
+#texto5 {
+  margin-top: 14px;
+  font-size: 0.95em;
+}
+
+/* 💓 Latido MUY sutil */
+@keyframes heartbeat {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  50%  { transform: translate(-50%, -50%) scale(1.015); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ❤️ Corazones */
+.heart {
+  position: fixed;
+  top: -30px;
+  font-size: 1.6em;
+  color: red;
+  animation: fall 2.5s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(20deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="recuadro2">
+  <h1>Hola corazón 💌🦦</h1>
+  <p>Te tengo una pregunta...</p>
+
+  <div id="cajaPregunta">
+    ¿Quieres ser mi San Valentín? No acepto un no por respuesta...
+  </div>
+
+  <div id="recuadro3">
+    <button id="btnYes">Sí 🫰🏻</button>
+    <button id="btnNo">No</button>
+  </div>
+
+  <p id="texto5">Elige bien (no tienes opción)</p>
+</div>
+
+<script>
+const btnYes = document.getElementById("btnYes");
+const btnNo = document.getElementById("btnNo");
+const texto5 = document.getElementById("texto5");
+const container = document.getElementById("recuadro3");
+const box = document.getElementById("recuadro2");
+
+let noCount = 0;
+let swapped = false;
+
+const phrases = [
+  "Di que sí",
+  "Por favor dale a sí",
+  "Sabemos que quieres darle un sí",
+  "Si le das a sí te doy una mordida",
+  "¡Ándale canelita chapopote!",
+  "Ya casi darás a sí",
+  "Yo sé que sí quieres",
+  "Casi lo tienes",
+  "Mi corazón dice que sí",
+  "DARYAN DALE A SÍ NO SEAS TERCA",
+  "Ya sabes cuál es la respuesta",
+  "Te dije que no tenías opción 🦁"
+];
+
+function latidoSuave() {
+  box.style.animation = "heartbeat 0.6s ease";
+  box.addEventListener("animationend", () => {
+    box.style.animation = "";
+  }, { once: true });
+}
+
+function lanzarCorazones() {
+  for (let i = 0; i < 18; i++) {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.textContent = "❤";
+    h.style.left = Math.random() * 100 + "%";
+    h.style.animationDelay = Math.random() * 0.8 + "s";
+    document.body.appendChild(h);
+    h.addEventListener("animationend", () => h.remove());
+  }
+}
+
+window.onload = lanzarCorazones;
+
+btnNo.addEventListener("click", () => {
+  noCount++;
+
+  /* FRASES EN ORDEN */
+  if (noCount <= phrases.length) {
+    texto5.textContent = phrases[noCount - 1];
+  }
+
+  /* CRECE DESDE EL PRIMER CLIC */
+  if (noCount <= 5) {
+    btnYes.style.transform = `scale(${1 + noCount * 0.18})`;
+    btnNo.style.transform = `scale(${1 - noCount * 0.12})`;
+    latidoSuave();
+  }
+
+  /* RESET */
+  else if (noCount === 6) {
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+  }
+
+  /* CAMBIAN DE LUGAR */
+  else if (noCount === 7 && !swapped) {
+    container.insertBefore(btnNo, btnYes);
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(0.75)";
+    swapped = true;
+  }
+
+  /* CRECIMIENTO MÁS NOTORIO */
+  else if (noCount > 7 && noCount < phrases.length) {
+    let grow = 1 + (noCount - 7) * 0.22;
+    btnYes.style.transform = `scale(${grow})`;
+    btnNo.style.transform = `scale(${Math.max(0.55, 1.6 - grow)})`;
+    latidoSuave();
+  }
+
+  /* 🦁 ÚLTIMA FRASE */
+  if (noCount === phrases.length) {
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+
+    btnNo.textContent = "Sí 🫰🏻";
+    btnNo.style.background = "black";
+    btnNo.style.color = "white";
+
+    btnNo.onclick = () => btnYes.click();
+  }
+});
+
+btnYes.addEventListener("click", () => {
+  lanzarCorazones();
+  document.getElementById("recuadro2").remove();
+
+  const final = document.createElement("div");
+  final.style.cssText = `
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(255,255,255,0.6);
+    padding:25px;
+    border-radius:25px;
+    text-align:center;
+    backdrop-filter:blur(4px);
+  `;
+
+  final.innerHTML = `
+    <h1>Siiiii ❤️</h1>
+    <p>Sabía que dirías que sí, te quiero muchooo</p>
+    <img src="dance-klenza.gif" width="200"><br><br>
+    <a href="cita.html">
+      <button style="
+        padding:12px 26px;
+        border-radius:30px;
+        border:none;
+        background:black;
+        color:white;
+        font-size:1em;
+        cursor:pointer;">
+        Cita 💌
+      </button>
+    </a>
+  `;
+
+  document.body.appendChild(final);
+});
+</script>
+
+</body>
+</html>
+
